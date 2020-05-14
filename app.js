@@ -1,9 +1,11 @@
 // app.js
 const mongoose = require('mongoose');
-const express = require('express')
+const express = require('express');
+
 const bodyParser = require('body-parser');
 const expressHandlebars = require("express-handlebars")
 const Handlebars = require('handlebars')
+const methodOverride = require('method-override')
 const {
   allowInsecurePrototypeAccess
 } = require('@handlebars/allow-prototype-access')
@@ -18,6 +20,8 @@ app.engine('handlebars', expressHandlebars({
 // }));
 
 app.set('view engine', 'handlebars');
+// override with POST having ?_method=DELETE or ?_method=PUT
+app.use(methodOverride('_method'))
 
 app.use(bodyParser.urlencoded({
   extended: true
@@ -50,7 +54,7 @@ app.get('/', (req, res) => {
 })
 // NEW
 app.get('/reviews/new', (req, res) => {
-  res.render('reviews-new', {});
+  res.render('reviews-new', { title: "New Review" });
 })
 
 // CREATE
@@ -75,6 +79,23 @@ app.get('/reviews/:id', (req, res) => {
   })
 })
 
+// EDIT
+app.get('/reviews/:id/edit', (req, res) => {
+  Review.findById(req.params.id, function(err, review) {
+    res.render('reviews-edit', { review: review, title: "Edit Review"});
+  })
+})
+
+// UPDATE
+app.put('/reviews/:id', (req, res) => {
+  Review.findByIdAndUpdate(req.params.id, req.body)
+    .then(review => {
+      res.redirect(`/reviews/${review._id}`)
+    })
+    .catch(err => {
+      console.log(err.message)
+    })
+})
 
 app.listen(3000, () => {
   console.log('App listening on port 3000!')
