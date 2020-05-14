@@ -55,7 +55,7 @@ app.get('/', (req, res) => {
 // NEW
 app.get('/reviews/new', (req, res) => {
   res.render('reviews-new', { title: "New Review" });
-})
+  })
 
 // CREATE
 app.post('/reviews', (req, res) => {
